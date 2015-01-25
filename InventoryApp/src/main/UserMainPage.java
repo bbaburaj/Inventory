@@ -1,6 +1,9 @@
 package main;
+
 import java.awt.CardLayout;
+import java.awt.Component;
 import java.awt.GridLayout;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -11,12 +14,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
@@ -43,11 +49,12 @@ public class UserMainPage extends JFrame {
 	private ArrayList<Object> unitSize = new ArrayList<Object>();
 	private JComboBox<Float> units = new JComboBox<Float>();
 	private JPanel resultProductPanel = new JPanel();
+	private JPanel resultOrderPanel = new JPanel();
 	private JPanel createOrderPanel = new JPanel();
 	private JTextField qnty = new JTextField();
-	private String username,dealername;
+	private String username, dealername;
 	private JButton cancelB = new JButton("CANCEL");
-	private String prodIdForNewOrder="";
+	private String prodIdForNewOrder = "";
 
 	/**
 	 * Create the frame.
@@ -59,10 +66,10 @@ public class UserMainPage extends JFrame {
 		this.connect = connect;
 		createPanel(this.contentPane);
 	}
-	
-	public void setUserDetail(String username, String firstname, String lastname){
+
+	public void setUserDetail(String username, String firstname, String lastname) {
 		this.username = username;
-		this.dealername = firstname+" "+lastname;
+		this.dealername = firstname + " " + lastname;
 	}
 
 	/**
@@ -74,6 +81,7 @@ public class UserMainPage extends JFrame {
 		final JPanel addNewUnitPanel = new JPanel();
 		final JPanel addNewProductPanel = new JPanel();
 		final JPanel checkProductPanelWithId = new JPanel();
+		final JPanel lookUpOrderPanel = new JPanel();
 		final CardLayout cl = new CardLayout();
 		contentPane.setLayout(cl);
 		contentPane.add(userPanel, "main");
@@ -82,6 +90,8 @@ public class UserMainPage extends JFrame {
 		contentPane.add(addNewProductPanel, "addP");
 		contentPane.add(checkProductPanelWithId, "checkPID");
 		contentPane.add(resultProductPanel, "resultProd");
+		contentPane.add(lookUpOrderPanel, "lookUpOrder");
+		contentPane.add(resultOrderPanel, "resultOrder");
 
 		userPanel.setLayout(new GridLayout(20, 1));
 		cl.show(contentPane, "main");
@@ -125,6 +135,13 @@ public class UserMainPage extends JFrame {
 		lookUpProductWithID.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				cl.show(contentPane, "checkPID");
+			}
+		});
+
+		lookUpOrder.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				lookUpOrderPanel(lookUpOrderPanel, cancelB, cl);
+				cl.show(contentPane, "lookUpOrder");
 			}
 		});
 
@@ -246,9 +263,76 @@ public class UserMainPage extends JFrame {
 		addNewProductPanel.add(cancelProdB);
 	}
 
+	private void lookUpOrderPanel(final JPanel orderpanel, JButton cancelB,
+			final CardLayout cl) {
+		orderpanel.removeAll();
+		orderpanel.setLayout((LayoutManager) new BoxLayout(orderpanel,
+				BoxLayout.Y_AXIS));
+		orderpanel.add(new JLabel("Order Id"));
+		JButton viewOrders = new JButton("View My Orders");
+		final ButtonGroup btnGrp = new ButtonGroup();
+		resultSet = Utility.getDetailsBasedOnOneCol("OrderId", "DealerId='"
+				+ username + "'", "orders", connect, statement, resultSet);
+		try {
+			while (resultSet.next()) {
+				JRadioButton btn = new JRadioButton(
+						resultSet.getString("OrderId"));
+				btn.setActionCommand(resultSet.getString("OrderId"));
+				btnGrp.add(btn);
+				orderpanel.add(btn);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		orderpanel.add(viewOrders);
+		viewOrders.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				System.out.println(btnGrp.getSelection().getActionCommand());
+				lookUpSingleOrderPanel(
+						btnGrp.getSelection().getActionCommand(),
+						resultOrderPanel);
+				cl.show(contentPane, "resultOrder");
+			}
+		});
+		orderpanel.add(cancelB);
+	}
+
+	private void lookUpSingleOrderPanel(String orderId, JPanel panel) {
+		try {
+			panel.removeAll();
+			panel.setLayout(new GridLayout(10, 2));
+			resultSet = Utility.getDetailsBasedOnOneCol("*", "OrderId='"
+					+ orderId + "'", "orders", connect, statement, resultSet);
+			while (resultSet.next()) {
+				panel.add(new JLabel("Order Id:"));
+				panel.add(new JLabel(resultSet.getString("OrderId")));
+				panel.add(new JLabel("Product Name:"));
+				panel.add(new JLabel(resultSet.getString("ProductName")));
+				panel.add(new JLabel("Unit Size:"));
+				panel.add(new JLabel(resultSet.getString("UnitSize")));
+				panel.add(new JLabel("Quantity:"));
+				panel.add(new JLabel(resultSet.getString("Units")));
+				panel.add(new JLabel("Order Date:"));
+				panel.add(new JLabel(resultSet.getString("OrderDate")));
+				panel.add(new JLabel("Customer:"));
+				panel.add(new JLabel(resultSet.getString("CustomerName")));
+				panel.add(new JLabel("Price Charged Per Unit:"));
+				panel.add(new JLabel(resultSet.getString("DealerPricePerUnit")));
+				panel.add(new JLabel("Freight Price Charged:"));
+				panel.add(new JLabel(resultSet.getString("FreightPrice")));
+				panel.add(new JLabel("Total Price:"));
+				panel.add(new JLabel(resultSet.getString("FreightPrice")));
+				panel.add(cancelB);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	public void setUpCreateOrderPanel(JPanel panel, final CardLayout cl) {
 		JButton button = new JButton("Add new Order");
-		
+
 		final JComboBox priceBox = new JComboBox();
 		final JTextField qty = new JTextField();
 		final JTextField customerName = new JTextField();
@@ -274,7 +358,7 @@ public class UserMainPage extends JFrame {
 		panel.add(customerName);
 		getPriceList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				resultSet = Utility.getProductDetailsBasedOnOneCol(
+				resultSet = Utility.getDetailsBasedOnOneCol("*",
 						"ProductName='"
 								+ prodNames.getSelectedItem().toString()
 								+ "' and UnitSize=" + units.getSelectedItem(),
@@ -283,23 +367,37 @@ public class UserMainPage extends JFrame {
 					priceBox.removeAllItems();
 					if (resultSet.next()) {
 						prodIdForNewOrder = resultSet.getString("ProductId");
-						priceBox.addItem(Float.toString(resultSet.getFloat("DealerPrice")));
-						priceBox.addItem(Float.toString(resultSet.getFloat("RetailPrice")));
-						priceBox.addItem(Float.toString(resultSet.getFloat("RetailPriceWithFreight")));
+						priceBox.addItem(Float.toString(resultSet
+								.getFloat("DealerPrice")));
+						priceBox.addItem(Float.toString(resultSet
+								.getFloat("RetailPrice")));
+						priceBox.addItem(Float.toString(resultSet
+								.getFloat("RetailPriceWithFreight")));
 					}
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
 		});
-		
+
 		panel.add(getPriceList);
 		panel.add(priceBox);
 		panel.add(new JLabel("Freight"));
 		panel.add(freight);
+
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Utility.addOrder(orderId.getText(), prodNames.getSelectedItem().toString(), prodIdForNewOrder, Float.valueOf(units.getSelectedItem().toString()), Float.valueOf(qty.getText()), customerName.getText(), format.format(date.getDate()), dealername, username, null, statement, connect);
+				float totalQnty = Float.valueOf(qty.getText());
+				float perUnitPrice = Float.valueOf(priceBox.getSelectedItem()
+						.toString());
+				float freightPrice = Float.valueOf(freight.getText());
+				float totalPrice = (totalQnty * perUnitPrice) + freightPrice;
+				Utility.addOrder(orderId.getText(), prodNames.getSelectedItem()
+						.toString(), prodIdForNewOrder, Float.valueOf(units
+						.getSelectedItem().toString()), totalQnty, customerName
+						.getText(), format.format(date.getDate()), dealername,
+						username, perUnitPrice, freightPrice, totalPrice, null,
+						statement, connect);
 				cl.show(contentPane, "main");
 			}
 		});
@@ -310,8 +408,8 @@ public class UserMainPage extends JFrame {
 
 	public void setupResultPanel(JPanel panel, String id, final CardLayout cl) {
 		try {
-			resultSet = Utility.getProductDetailsBasedOnOneCol("ProductId='"
-					+ id + "'", "Product", connect, statement, resultSet);
+			resultSet = Utility.getDetailsBasedOnOneCol("*", "ProductId='" + id
+					+ "'", "Product", connect, statement, resultSet);
 			if (!(resultSet.next())) {
 				panel.add(new JLabel("Invalid Data"));
 			} else {

@@ -52,11 +52,12 @@ public class Utility {
 	}
 	
 
-	public static ResultSet getProductDetailsBasedOnOneCol(String clause, String table, Connection connect, Statement statement, ResultSet resultSet) {
+
+	public static ResultSet getDetailsBasedOnOneCol(String select, String clause, String table, Connection connect, Statement statement, ResultSet resultSet) {
 		try {
 			statement = connect.createStatement();
 			resultSet = statement
-					.executeQuery("select * from "+table+" where "+clause+";");
+					.executeQuery("select "+select+" from "+table+" where "+clause+";");
 			return resultSet;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -94,10 +95,12 @@ public class Utility {
 		}
 	}
 	
-	public static void addOrder(String orderId, String prodname, String prodId,float unitSize, float qty, String customerName, String date, String dealerName, String dealerId, byte[] invoice, Statement statement, Connection connect) {
+	public static void addOrder(String orderId, String prodname, String prodId,float unitSize, float qty, String customerName, String date, String dealerName, String dealerId, float dp, float freight, float total,byte[] invoice, Statement statement, Connection connect) {
 		try {
+			
 			statement = connect.createStatement();
-			String query = "INSERT INTO orders (`OrderId`,`ProductName`,`ProductId`,`OrderDate`,`UnitSize`,`Units`,`CustomerName`,`DealerName`,`DealerId`,`Invoice`) VALUES ('"+orderId+"','"+prodname+"','"+prodId+"','"+date+"',"+unitSize+","+qty+",'"+customerName+"','"+dealerName+"','"+dealerId+"',"+invoice+");";
+			String query = "INSERT INTO `inventory`.`orders`(`OrderId`,`ProductName`,`ProductId`,`OrderDate`,`UnitSize`,`Units`,`CustomerName`,`DealerName`,`DealerId`,`Invoice`,`DealerPricePerUnit`,`FreightPrice`,`TotalPrice`) VALUES ('"+orderId+"','"+prodname+"','"+prodId+"','"+date+"',"+unitSize+","+qty+",'"+customerName+"','"+dealerName+"','"+dealerId+"',"+invoice+","+dp+","+freight+","+total+");";
+			
 			statement.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();

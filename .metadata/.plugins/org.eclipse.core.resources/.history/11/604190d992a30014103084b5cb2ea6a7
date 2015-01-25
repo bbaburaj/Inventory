@@ -1,0 +1,471 @@
+package main;
+import java.awt.CardLayout;
+import java.awt.Component;
+import java.awt.GridLayout;
+import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
+import org.jdesktop.swingx.JXDatePicker;
+
+import Utility.Utility;
+
+public class UserMainPage extends JFrame {
+
+	private JPanel contentPane;
+	private Connection connect;
+	private Statement statement = null;
+	private ResultSet resultSet = null;
+	private ArrayList<Object> productNames = new ArrayList<Object>();
+	private JComboBox<String> prodNames = new JComboBox<String>();
+	private JTextField prodName = new JTextField();
+	private JTextField prodId = new JTextField();
+	private JTextField totalUnits = new JTextField();
+	private JTextField dealerPrice = new JTextField();
+	private JTextField retailPrice = new JTextField();
+	private JTextField retailPriceWithFreight = new JTextField();
+	private ArrayList<Object> productIDS = new ArrayList<Object>();
+	private JComboBox<String> productIds = new JComboBox<String>();
+	private ArrayList<Object> unitSize = new ArrayList<Object>();
+	private JComboBox<Float> units = new JComboBox<Float>();
+	private JPanel resultProductPanel = new JPanel();
+	private JPanel resultOrderPanel = new JPanel();
+	private JPanel createOrderPanel = new JPanel();
+	private JTextField qnty = new JTextField();
+	private String username,dealername;
+	private JButton cancelB = new JButton("CANCEL");
+	private String prodIdForNewOrder="";
+
+	/**
+	 * Create the frame.
+	 */
+	public UserMainPage(JPanel contentPane, Connection connect) {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 450, 300);
+		this.contentPane = contentPane;
+		this.connect = connect;
+		createPanel(this.contentPane);
+	}
+	
+	public void setUserDetail(String username, String firstname, String lastname){
+		this.username = username;
+		this.dealername = firstname+" "+lastname;
+	}
+
+	/**
+	 * @param contentPane
+	 */
+	private void createPanel(final JPanel contentPane) {
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		JPanel userPanel = new JPanel();
+		final JPanel addNewUnitPanel = new JPanel();
+		final JPanel addNewProductPanel = new JPanel();
+		final JPanel checkProductPanelWithId = new JPanel();
+		final JPanel lookUpOrderPanel = new JPanel();
+		final CardLayout cl = new CardLayout();
+		contentPane.setLayout(cl);
+		contentPane.add(userPanel, "main");
+		contentPane.add(addNewUnitPanel, "add");
+		contentPane.add(createOrderPanel, "createO");
+		contentPane.add(addNewProductPanel, "addP");
+		contentPane.add(checkProductPanelWithId, "checkPID");
+		contentPane.add(resultProductPanel, "resultProd");
+		contentPane.add(lookUpOrderPanel, "lookUpOrder");
+
+		userPanel.setLayout(new GridLayout(20, 1));
+		cl.show(contentPane, "main");
+		userPanel.add(new JLabel("Click on any of the following options"));
+		JButton addNewUnits = new JButton("Add Units to Inventory");
+		JButton createAnOrder = new JButton("Create Order");
+		JButton lookUpOrder = new JButton("Look up an Order");
+		JButton lookUpProductWithID = new JButton(
+				"Check Product Using Product ID");
+		JButton addNewProduct = new JButton("Add Product");
+		userPanel.add(addNewUnits);
+		userPanel.add(lookUpProductWithID);
+		userPanel.add(lookUpOrder);
+		userPanel.add(createAnOrder);
+		userPanel.add(addNewProduct);
+		Utility.getProductDetail(productNames, "ProductName", "Product",
+				connect, statement, resultSet);
+		prodNames = new JComboBox<String>(
+				productNames.toArray(new String[productNames.size()]));
+		addNewUnits.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				prodNames.removeAllItems();
+				for (Object s : productNames) {
+					prodNames.addItem(s.toString());
+				}
+				cl.show(contentPane, "add");
+			}
+		});
+		createAnOrder.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				setUpCreateOrderPanel(createOrderPanel, cl);
+				cl.show(contentPane, "createO");
+			}
+		});
+
+		addNewProduct.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				cl.show(contentPane, "addP");
+			}
+		});
+		lookUpProductWithID.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				cl.show(contentPane, "checkPID");
+			}
+		});
+		
+		lookUpOrder.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				lookUpOrderPanel(lookUpOrderPanel,cancelB);
+				cl.show(contentPane, "lookUpOrder");
+			}
+		});
+
+		Utility.getProductDetail(unitSize, "UnitSize", "Product", connect,
+				statement, resultSet);
+		units = new JComboBox<Float>(
+				unitSize.toArray(new Float[unitSize.size()]));
+		final JComboBox unitsNewUnit = new JComboBox<Float>(
+				unitSize.toArray(new Float[unitSize.size()]));
+		JButton addB = new JButton("ADD");
+		JButton addProductB = new JButton("ADD PRODUCT");
+		JButton cancelProdB = new JButton("CANCEL");
+		qnty.setColumns(10);
+		addNewUnitPanel.setLayout(new GridLayout(4, 2));
+		addNewUnitPanel.setSize(300, 300);
+		addNewUnitPanel.add(new JLabel("Product"));
+		addNewUnitPanel.add(prodNames);
+		addNewUnitPanel.add(new JLabel("Unit Size"));
+		addNewUnitPanel.add(unitsNewUnit);
+		addNewUnitPanel.add(new JLabel("Number of units"));
+		addNewUnitPanel.add(qnty);
+		addNewUnitPanel.add(addB);
+		addNewUnitPanel.add(cancelB);
+
+		addB.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String product = prodNames.getSelectedItem().toString();
+				float unitSize = Float.valueOf(unitsNewUnit.getSelectedItem()
+						.toString());
+				float newQty = Float.valueOf(qnty.getText());
+				float updatedQty = newQty + getCurrentQty(product, unitSize);
+				Utility.addNewUnits(product, updatedQty, unitSize, connect,
+						statement);
+				JOptionPane.showMessageDialog(addNewUnitPanel,
+						"Quantity updated to " + updatedQty + "!");
+				cl.show(contentPane, "main");
+			}
+		});
+		cancelB.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				cl.show(contentPane, "main");
+			}
+		});
+		setupAddNewProductPanel(addNewProductPanel, addProductB, cancelProdB);
+
+		addProductB.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String product = prodName.getText();
+				String id = prodId.getText();
+				float unitSize = Float.valueOf(units.getSelectedItem()
+						.toString());
+				float qty = (totalUnits.getText().length() < 1) ? 0 : Float
+						.valueOf(totalUnits.getText());
+				float rP = (retailPrice.getText().length() < 1) ? 0 : Float
+						.valueOf(retailPrice.getText());
+				float dP = (dealerPrice.getText().length() < 1) ? 0 : Float
+						.valueOf(dealerPrice.getText());
+				float rPF = (retailPriceWithFreight.getText().length() < 1) ? 0
+						: Float.valueOf(retailPriceWithFreight.getText());
+				Utility.addNewProduct(product, id, unitSize, qty, rP, dP, rPF,
+						connect, statement);
+				productNames.add(product);
+				JOptionPane.showMessageDialog(addNewUnitPanel,
+						"Added the new product " + product + "!");
+				cl.show(contentPane, "main");
+			}
+		});
+		cancelProdB.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				cl.show(contentPane, "main");
+			}
+		});
+		Utility.getProductDetail(productIDS, "ProductId", "Product", connect,
+				statement, resultSet);
+		productIds = new JComboBox<String>(
+				productIDS.toArray(new String[productIDS.size()]));
+		checkProductPanelWithId.setLayout(new GridLayout(8, 2));
+		checkProductPanelWithId.add(new JLabel("Product ID"));
+		checkProductPanelWithId.add(productIds);
+		JButton checkB = new JButton("Check Product");
+		checkProductPanelWithId.add(checkB);
+		checkB.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				resultProductPanel.removeAll();
+				resultProductPanel.setLayout(new GridLayout(9, 2));
+				setupResultPanel(resultProductPanel, productIds
+						.getSelectedItem().toString(), cl);
+				cl.show(contentPane, "resultProd");
+			}
+		});
+		setContentPane(contentPane);
+	}
+
+	/**
+	 * @param addNewProductPanel
+	 * @param addProductB
+	 * @param cancelProdB
+	 */
+	private void setupAddNewProductPanel(final JPanel addNewProductPanel,
+			JButton addProductB, JButton cancelProdB) {
+		addNewProductPanel.setLayout(new GridLayout(8, 2));
+		addNewProductPanel.add(new JLabel("Product Name"));
+		addNewProductPanel.add(prodName);
+		addNewProductPanel
+				.add(new JLabel(
+						"Product ID (Make it a combination of UnitSize and ProductName: eg 1GalSI, 2.5GalSI)"));
+		addNewProductPanel.add(prodId);
+		addNewProductPanel.add(new JLabel("Unit Size in Gallons"));
+		addNewProductPanel.add(units);
+		addNewProductPanel.add(new JLabel("Quantity"));
+		addNewProductPanel.add(totalUnits);
+		addNewProductPanel.add(new JLabel("Dealer Price"));
+		addNewProductPanel.add(dealerPrice);
+		addNewProductPanel.add(new JLabel("Retail Price"));
+		addNewProductPanel.add(retailPrice);
+		addNewProductPanel.add(new JLabel("RetailPrice With Freight"));
+		addNewProductPanel.add(retailPriceWithFreight);
+		addNewProductPanel.add(addProductB);
+		addNewProductPanel.add(cancelProdB);
+	}
+	
+	private void lookUpOrderPanel(JPanel orderpanel,JButton cancelB) {
+		orderpanel.setLayout((LayoutManager) new BoxLayout(orderpanel, BoxLayout.Y_AXIS));
+		orderpanel.add(new JLabel("Order Id"));
+		JButton viewOrders = new JButton("View My Orders");
+		final ButtonGroup btnGrp = new ButtonGroup();
+		resultSet = Utility.getDetailsBasedOnOneCol("OrderId",
+				"DealerId='"+username+"'",
+				"orders", connect, statement, resultSet);
+		try {
+			while (resultSet.next()) {
+				JRadioButton btn = new JRadioButton(resultSet.getString("OrderId"));
+				btn.setActionCommand(resultSet.getString("OrderId"));
+				btnGrp.add(btn);
+				orderpanel.add(btn);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		orderpanel.add(viewOrders);
+		viewOrders.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				System.out.println(btnGrp.getSelection().getActionCommand());
+				lookUpSingleOrderPanel(btnGrp.getSelection().getActionCommand());}});
+		orderpanel.add(cancelB);
+	}
+	
+	private void lookUpSingleOrderPanel(String orderId){
+		try {
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridLayout(8,2));
+		resultSet = Utility.getDetailsBasedOnOneCol("*",
+				"OrderId='"+orderId+"'",
+				"orders", connect, statement, resultSet);
+		while(resultSet.next()){
+			panel.add(new JLabel("Order Id"));
+			panel.add(new JLabel(resultSet.getString("OrderId")));
+		}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}
+
+	public void setUpCreateOrderPanel(JPanel panel, final CardLayout cl) {
+		JButton button = new JButton("Add new Order");
+		
+		final JComboBox priceBox = new JComboBox();
+		final JTextField qty = new JTextField();
+		final JTextField customerName = new JTextField();
+		final JTextField freight = new JTextField();
+		final JTextField orderId = new JTextField();
+		final JButton getPriceList = new JButton("Get the PriceList");
+		final JXDatePicker date = new JXDatePicker();
+		final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		date.setDate(Calendar.getInstance().getTime());
+		date.setFormats(format);
+		panel.setLayout(new GridLayout(12, 2));
+		panel.add(new JLabel("Reference Number:"));
+		panel.add(orderId);
+		panel.add(new JLabel("Select Product:"));
+		panel.add(prodNames);
+		panel.add(new JLabel("Select Unit Size"));
+		panel.add(units);
+		panel.add(new JLabel("Quantity"));
+		panel.add(qty);
+		panel.add(new JLabel("Order Date"));
+		panel.add(date);
+		panel.add(new JLabel("Customer Name"));
+		panel.add(customerName);
+		getPriceList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				resultSet = Utility.getDetailsBasedOnOneCol("*",
+						"ProductName='"
+								+ prodNames.getSelectedItem().toString()
+								+ "' and UnitSize=" + units.getSelectedItem(),
+						"product", connect, statement, resultSet);
+				try {
+					priceBox.removeAllItems();
+					if (resultSet.next()) {
+						prodIdForNewOrder = resultSet.getString("ProductId");
+						priceBox.addItem(Float.toString(resultSet.getFloat("DealerPrice")));
+						priceBox.addItem(Float.toString(resultSet.getFloat("RetailPrice")));
+						priceBox.addItem(Float.toString(resultSet.getFloat("RetailPriceWithFreight")));
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
+		panel.add(getPriceList);
+		panel.add(priceBox);
+		panel.add(new JLabel("Freight"));
+		panel.add(freight);
+		
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				float totalQnty = Float.valueOf(qty.getText());
+				float perUnitPrice = Float.valueOf(priceBox.getSelectedItem().toString());
+				float freightPrice = Float.valueOf(freight.getText());
+				float totalPrice = (totalQnty*perUnitPrice)+freightPrice;
+				Utility.addOrder(orderId.getText(), prodNames.getSelectedItem().toString(), prodIdForNewOrder, Float.valueOf(units.getSelectedItem().toString()), totalQnty, customerName.getText(), format.format(date.getDate()), dealername, username, perUnitPrice ,freightPrice,totalPrice,null, statement, connect);
+				cl.show(contentPane, "main");
+			}
+		});
+		panel.add(button);
+		panel.add(cancelB);
+
+	}
+
+	
+	
+	public void setupResultPanel(JPanel panel, String id, final CardLayout cl) {
+		try {
+			resultSet = Utility.getDetailsBasedOnOneCol("*","ProductId='"
+					+ id + "'", "Product", connect, statement, resultSet);
+			if (!(resultSet.next())) {
+				panel.add(new JLabel("Invalid Data"));
+			} else {
+				panel.add(new JLabel("ProductName"));
+				final String prodName = resultSet.getString("ProductName");
+				final String unitSize = Float.toString(resultSet
+						.getFloat("UnitSize"));
+				panel.add(new JLabel(prodName));
+				panel.add(new JLabel("Unit Size"));
+				panel.add(new JLabel(unitSize));
+				final String currentQty = Float.toString(resultSet
+						.getFloat("Quantity"));
+				final String currentRP = Float.toString(resultSet
+						.getFloat("RetailPrice"));
+				final String currentDP = Float.toString(resultSet
+						.getFloat("DealerPrice"));
+				final String currentRPF = Float.toString(resultSet
+						.getFloat("RetailPriceWithFreight"));
+				final JTextField qnty = new JTextField(currentQty);
+				final JTextField rp = new JTextField(currentRP);
+				final JTextField dp = new JTextField(currentDP);
+				final JTextField rpF = new JTextField(currentRPF);
+				panel.add(new JLabel("Quantity"));
+				panel.add(qnty);
+				panel.add(new JLabel("Delaer Price"));
+				panel.add(dp);
+				panel.add(new JLabel("Retail Price"));
+				panel.add(rp);
+				panel.add(new JLabel("Retail Price With Freight"));
+				panel.add(rpF);
+				JButton button1 = new JButton("OK");
+				JButton button2 = new JButton("UPDATE");
+				button1.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						cl.show(contentPane, "main");
+					}
+				});
+				panel.add(button1);
+				panel.add(button2);
+				button2.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						String clause = "";
+						if (currentQty.compareTo(qnty.getText()) != 0) {
+							clause += "," + "Quantity=" + qnty.getText();
+						}
+						if (currentRP.compareTo(rp.getText()) != 0) {
+							clause += "," + "RetailPrice=" + rp.getText();
+						}
+						if (currentRPF.compareTo(rpF.getText()) != 0) {
+							clause += "," + "RetailPriceWithFreight="
+									+ rpF.getText();
+						}
+						if (currentDP.compareTo(dp.getText()) != 0) {
+							clause += "," + "DealerPrice=" + dp.getText();
+						}
+						if (clause.length() > 1) {
+							clause = clause.replaceFirst(",", "");
+							String whereclause = "productName='" + prodName
+									+ "' and unitsize=" + unitSize;
+							Utility.updateProdInfo(whereclause, clause,
+									connect, statement);
+						}
+						cl.show(contentPane, "main");
+					}
+				});
+			}
+
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(contentPane, e.getLocalizedMessage());
+		}
+
+	}
+
+	public float getCurrentQty(String column, float unitsize) {
+		try {
+			statement = connect.createStatement();
+			resultSet = statement
+					.executeQuery("select quantity from product where ProductName"
+							+ "=\""
+							+ column
+							+ "\" and UnitSize="
+							+ unitsize
+							+ ";");
+			if (resultSet.next()) {
+				return resultSet.getFloat("Quantity");
+			}
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(contentPane, e.getLocalizedMessage());
+		}
+		return 0;
+	}
+}
