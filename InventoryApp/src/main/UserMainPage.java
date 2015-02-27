@@ -56,22 +56,30 @@ public class UserMainPage extends JFrame {
 	private String username, dealername;
 	private JButton cancelB = new JButton("CANCEL");
 	private String prodIdForNewOrder = "";
+	private Inventory inv = null;
 
 	/**
 	 * Create the frame.
 	 */
-	public UserMainPage(JPanel contentPane, Connection connect) {
+	public UserMainPage(JPanel contentPane, Connection connect,Inventory inv) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		this.contentPane = contentPane;
 		this.connect = connect;
 		createPanel(this.contentPane);
+		this.inv = inv;
 	}
 
 	public void setUserDetail(String username, String firstname, String lastname) {
 		this.username = username;
 		this.dealername = firstname + " " + lastname;
 	}
+	
+	public void resetUserDetails() {
+		this.username = "";
+		this.dealername = "";
+	}
+
 
 	/**
 	 * @param contentPane
@@ -94,7 +102,7 @@ public class UserMainPage extends JFrame {
 		contentPane.add(lookUpOrderPanel, "lookUpOrder");
 		contentPane.add(resultOrderPanel, "resultOrder");
 
-		userPanel.setLayout(new GridLayout(20, 1));
+		userPanel.setLayout(new GridLayout(7, 1));
 		cl.show(contentPane, "main");
 		userPanel.add(new JLabel("Click on any of the following options"));
 		JButton addNewUnits = new JButton("Add Units to Inventory");
@@ -103,11 +111,13 @@ public class UserMainPage extends JFrame {
 		JButton lookUpProductWithID = new JButton(
 				"Check Product Using Product ID");
 		JButton addNewProduct = new JButton("Add Product");
+		JButton logOff = new JButton("LogOff");
 		userPanel.add(addNewUnits);
 		userPanel.add(lookUpProductWithID);
 		userPanel.add(lookUpOrder);
 		userPanel.add(createAnOrder);
 		userPanel.add(addNewProduct);
+		userPanel.add(logOff);
 		Utility.getProductDetail(productNames, "ProductName", "Product",
 				connect, statement, resultSet);
 		prodNames = new JComboBox<String>(
@@ -143,6 +153,13 @@ public class UserMainPage extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				lookUpOrderPanel(lookUpOrderPanel, cancelB, cl);
 				cl.show(contentPane, "lookUpOrder");
+			}
+		});
+		
+		logOff.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				inv.resetDetails();
+				resetUserDetails();
 			}
 		});
 
@@ -290,14 +307,14 @@ public class UserMainPage extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				lookUpSingleOrderPanel(
 						btnGrp.getSelection().getActionCommand(),
-						resultOrderPanel);
+						resultOrderPanel,cl);
 				cl.show(contentPane, "resultOrder");
 			}
 		});
 		orderpanel.add(cancelB);
 	}
 
-	private void lookUpSingleOrderPanel(String orderId, JPanel panel) {
+	private void lookUpSingleOrderPanel(String orderId, JPanel panel,final CardLayout cl) {
 		try {
 			panel.removeAll();
 			panel.setLayout(new GridLayout(10, 2));
@@ -325,10 +342,12 @@ public class UserMainPage extends JFrame {
 				panel.add(new JLabel("Total Price:"));
 				panel.add(new JLabel(order.getTotalPrice()));
 				panel.add(cancelB);
-				JButton printB = new JButton("Print Inventory");
+				JButton printB = new JButton("Create Inventory");
 				printB.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						order.generateInventory();
+						JOptionPane.showMessageDialog(contentPane, "Inventory created and saved under C:\\Inventory.");
+						cl.show(contentPane, "main");
 					}
 				});
 				panel.add(printB);

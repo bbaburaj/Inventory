@@ -67,7 +67,7 @@ public class Inventory extends JFrame {
 		mainPane.add(userMainPagePane,"user");
 		cl.show(mainPane, "login");
 	}
-
+	
 	/**
 	 * 
 	 */
@@ -241,7 +241,13 @@ public class Inventory extends JFrame {
 	}
 	
 	private void setUserMainPage(JPanel userMainPage){
-		mainPage = new UserMainPage(userMainPage,connect);
+		mainPage = new UserMainPage(userMainPage,connect,this);
+	}
+	
+	public void resetDetails(){
+		cl.show(mainPane, "login");
+		uName.setText("");
+		pswrd.setText("");
 	}
 	
 
