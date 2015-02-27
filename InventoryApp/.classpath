@@ -18,5 +18,10 @@
 	<classpathentry kind="lib" path="C:/Program Files/Java/jdk1.8.0_25/bin/swingx-0.9.4.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files (x86)/Java/jdk1.8.0_25/lib/missioncontrol/plugins/com.jrockit.mc.rjmx_5.4.0.162463/lib/mailapi.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files (x86)/Java/jdk1.8.0_25/lib/missioncontrol/plugins/com.jrockit.mc.rjmx_5.4.0.162463/lib/smtp.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Barathi/Documents/GitHub/Inventory/InventoryApp/lib/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Barathi/Documents/GitHub/Inventory/InventoryApp/lib/commons-io-2.4-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Barathi/Documents/GitHub/Inventory/InventoryApp/lib/commons-io-2.4-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Barathi/Documents/GitHub/Inventory/InventoryApp/lib/commons-io-2.4-tests.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Barathi/Documents/GitHub/Inventory/InventoryApp/lib/commons-io-2.4-test-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

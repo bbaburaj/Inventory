@@ -1,7 +1,6 @@
 package main;
 
 import java.awt.CardLayout;
-import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
@@ -28,10 +27,12 @@ import javax.swing.border.EmptyBorder;
 
 import org.jdesktop.swingx.JXDatePicker;
 
+import Utility.Order;
 import Utility.Utility;
 
 public class UserMainPage extends JFrame {
 
+	private static final long serialVersionUID = 546189373283133923L;
 	private JPanel contentPane;
 	private Connection connect;
 	private Statement statement = null;
@@ -149,7 +150,7 @@ public class UserMainPage extends JFrame {
 				statement, resultSet);
 		units = new JComboBox<Float>(
 				unitSize.toArray(new Float[unitSize.size()]));
-		final JComboBox unitsNewUnit = new JComboBox<Float>(
+		final JComboBox<Float> unitsNewUnit = new JComboBox<Float>(
 				unitSize.toArray(new Float[unitSize.size()]));
 		JButton addB = new JButton("ADD");
 		JButton addProductB = new JButton("ADD PRODUCT");
@@ -287,7 +288,6 @@ public class UserMainPage extends JFrame {
 		orderpanel.add(viewOrders);
 		viewOrders.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println(btnGrp.getSelection().getActionCommand());
 				lookUpSingleOrderPanel(
 						btnGrp.getSelection().getActionCommand(),
 						resultOrderPanel);
@@ -301,29 +301,38 @@ public class UserMainPage extends JFrame {
 		try {
 			panel.removeAll();
 			panel.setLayout(new GridLayout(10, 2));
+			
 			resultSet = Utility.getDetailsBasedOnOneCol("*", "OrderId='"
 					+ orderId + "'", "orders", connect, statement, resultSet);
-			while (resultSet.next()) {
+			final Order order = new Order(resultSet);
+			
 				panel.add(new JLabel("Order Id:"));
-				panel.add(new JLabel(resultSet.getString("OrderId")));
+				panel.add(new JLabel(order.getId()));
 				panel.add(new JLabel("Product Name:"));
-				panel.add(new JLabel(resultSet.getString("ProductName")));
+				panel.add(new JLabel(order.getProdName()));
 				panel.add(new JLabel("Unit Size:"));
-				panel.add(new JLabel(resultSet.getString("UnitSize")));
+				panel.add(new JLabel(order.getUnitSize()));
 				panel.add(new JLabel("Quantity:"));
-				panel.add(new JLabel(resultSet.getString("Units")));
+				panel.add(new JLabel(order.getUnits()));
 				panel.add(new JLabel("Order Date:"));
-				panel.add(new JLabel(resultSet.getString("OrderDate")));
+				panel.add(new JLabel(order.getDate()));
 				panel.add(new JLabel("Customer:"));
-				panel.add(new JLabel(resultSet.getString("CustomerName")));
+				panel.add(new JLabel(order.getCustomerName()));
 				panel.add(new JLabel("Price Charged Per Unit:"));
-				panel.add(new JLabel(resultSet.getString("DealerPricePerUnit")));
+				panel.add(new JLabel(order.getPricePerUnit()));
 				panel.add(new JLabel("Freight Price Charged:"));
-				panel.add(new JLabel(resultSet.getString("FreightPrice")));
+				panel.add(new JLabel(order.getFreightPrice()));
 				panel.add(new JLabel("Total Price:"));
-				panel.add(new JLabel(resultSet.getString("FreightPrice")));
+				panel.add(new JLabel(order.getTotalPrice()));
 				panel.add(cancelB);
-			}
+				JButton printB = new JButton("Print Inventory");
+				printB.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						order.generateInventory();
+					}
+				});
+				panel.add(printB);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -333,9 +342,11 @@ public class UserMainPage extends JFrame {
 	public void setUpCreateOrderPanel(JPanel panel, final CardLayout cl) {
 		JButton button = new JButton("Add new Order");
 
-		final JComboBox priceBox = new JComboBox();
+		final JComboBox<String> priceBox = new JComboBox<String>();
 		final JTextField qty = new JTextField();
 		final JTextField customerName = new JTextField();
+		final JTextField customerAddress = new JTextField();
+		final JTextField customerPhoneNumber = new JTextField();
 		final JTextField freight = new JTextField();
 		final JTextField orderId = new JTextField();
 		final JButton getPriceList = new JButton("Get the PriceList");
@@ -356,6 +367,10 @@ public class UserMainPage extends JFrame {
 		panel.add(date);
 		panel.add(new JLabel("Customer Name"));
 		panel.add(customerName);
+		panel.add(new JLabel("Customer Address"));
+		panel.add(customerAddress);
+		panel.add(new JLabel("Customer Phone Number"));
+		panel.add(customerPhoneNumber);
 		getPriceList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				resultSet = Utility.getDetailsBasedOnOneCol("*",
@@ -395,7 +410,7 @@ public class UserMainPage extends JFrame {
 				Utility.addOrder(orderId.getText(), prodNames.getSelectedItem()
 						.toString(), prodIdForNewOrder, Float.valueOf(units
 						.getSelectedItem().toString()), totalQnty, customerName
-						.getText(), format.format(date.getDate()), dealername,
+						.getText(), customerAddress.getText(), customerPhoneNumber.getText(),format.format(date.getDate()), dealername,
 						username, perUnitPrice, freightPrice, totalPrice, null,
 						statement, connect);
 				cl.show(contentPane, "main");

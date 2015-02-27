@@ -95,17 +95,18 @@ public class Utility {
 		}
 	}
 	
-	public static void addOrder(String orderId, String prodname, String prodId,float unitSize, float qty, String customerName, String date, String dealerName, String dealerId, float dp, float freight, float total,byte[] invoice, Statement statement, Connection connect) {
+	public static void addOrder(String orderId, String prodname, String prodId,float unitSize, float qty, String customerName, String address, String phNumber, String date, String dealerName, String dealerId, float dp, float freight, float total,byte[] invoice, Statement statement, Connection connect) {
 		try {
 			
 			statement = connect.createStatement();
-			String query = "INSERT INTO `inventory`.`orders`(`OrderId`,`ProductName`,`ProductId`,`OrderDate`,`UnitSize`,`Units`,`CustomerName`,`DealerName`,`DealerId`,`Invoice`,`DealerPricePerUnit`,`FreightPrice`,`TotalPrice`) VALUES ('"+orderId+"','"+prodname+"','"+prodId+"','"+date+"',"+unitSize+","+qty+",'"+customerName+"','"+dealerName+"','"+dealerId+"',"+invoice+","+dp+","+freight+","+total+");";
+			String query = "INSERT INTO `inventory`.`orders`(`OrderId`,`ProductName`,`ProductId`,`OrderDate`,`UnitSize`,`Units`,`CustomerName`,`CustomerAddress`,`CustomerPhoneNumber`,`DealerName`,`DealerId`,`Invoice`,`DealerPricePerUnit`,`FreightPrice`,`TotalPrice`) VALUES ('"+orderId+"','"+prodname+"','"+prodId+"','"+date+"',"+unitSize+","+qty+",'"+customerName+"','"+address+"','"+phNumber+"','"+dealerName+"','"+dealerId+"',"+invoice+","+dp+","+freight+","+total+");";
 			
 			statement.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
+	
 	
 
 

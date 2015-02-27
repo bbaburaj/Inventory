@@ -1,0 +1,105 @@
+package Utility;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class Order {
+	String id;
+	String prodName;
+	String unitSize;
+	String units;
+	String date;
+	String customerName;
+	String pricePerUnit;
+	String freightPrice;
+	String totalPrice;
+
+	public Order(ResultSet rs) {
+		try {
+			this.id = rs.getString("OrderId");
+			this.prodName = rs.getString("ProductName");
+			this.unitSize = rs.getString("UnitSize");
+			this.units = rs.getString("Units");
+			this.date = rs.getString("OrderDate");
+			this.customerName = rs.getString("CustomerName");
+			this.pricePerUnit = rs.getString("DealerPricePerUnit");
+			this.freightPrice = rs.getString("FreightPrice");
+			this.totalPrice = rs.getString("TotalPrice");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getProdName() {
+		return prodName;
+	}
+
+	public void setProdName(String prodName) {
+		this.prodName = prodName;
+	}
+
+	public String getUnitSize() {
+		return unitSize;
+	}
+
+	public void setUnitSize(String unitSize) {
+		this.unitSize = unitSize;
+	}
+
+	public String getUnits() {
+		return units;
+	}
+
+	public void setUnits(String units) {
+		this.units = units;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
+	}
+
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+	public String getPricePerUnit() {
+		return pricePerUnit;
+	}
+
+	public void setPricePerUnit(String pricePerUnit) {
+		this.pricePerUnit = pricePerUnit;
+	}
+
+	public String getFreightPrice() {
+		return freightPrice;
+	}
+
+	public void setFreightPrice(String freightPrice) {
+		this.freightPrice = freightPrice;
+	}
+
+	public String getTotalPrice() {
+		return totalPrice;
+	}
+
+	public void setTotalPrice(String totalPrice) {
+		this.totalPrice = totalPrice;
+	}
+
+}

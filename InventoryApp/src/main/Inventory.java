@@ -5,20 +5,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.awt.CardLayout;
-import java.awt.EventQueue;
 import java.awt.GridLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
-import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-
 import Utility.Utility;
 
 import java.awt.event.ActionListener;
@@ -26,6 +22,10 @@ import java.awt.event.ActionEvent;
 
 public class Inventory extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3035309723810078113L;
 	private JPanel contentPane,userMainPagePane;
 	private JPanel infoPanel;
 	private JTextField uName;
@@ -94,6 +94,7 @@ public class Inventory extends JFrame {
 		contentPane.add(loginPanel);
 		JButton loginB = new JButton("Login");
 		loginB.addActionListener(new ActionListener() {
+			@SuppressWarnings("deprecation")
 			public void actionPerformed(ActionEvent arg0) {
 				if (checkLogin(uName.getText(), pswrd.getText())) {
 					JOptionPane.showMessageDialog(contentPane, "Welcome "

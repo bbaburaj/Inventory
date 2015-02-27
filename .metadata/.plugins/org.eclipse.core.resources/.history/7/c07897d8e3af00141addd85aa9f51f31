@@ -1,0 +1,35 @@
+package Utility;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class Order {
+	String id;
+	String prodName;
+	String unitSize;
+	String units;
+	String date;
+	String customerName;
+	String pricePerUnit;
+	String freightPrice;
+	String totalPrice;
+
+	public Order(ResultSet rs) {
+		try {
+			this.id = rs.getString("OrderId");
+			this.prodName = rs.getString("ProductName");
+			this.unitSize = rs.getString("UnitSize");
+			this.units = rs.getString("Units");
+			this.date = rs.getString("OrderDate");
+			this.customerName = rs.getString("CustomerName");
+			this.pricePerUnit = rs.getString("DealerPricePerUnit");
+			this.freightPrice = rs.getString("FreightPrice");
+			this.totalPrice = rs.getString("TotalPrice");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	
+
+}

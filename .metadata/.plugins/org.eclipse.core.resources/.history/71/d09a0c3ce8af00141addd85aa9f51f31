@@ -1,0 +1,80 @@
+package Utility;
+
+import java.io.File;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class Order {
+	String id;
+	String prodName;
+	String unitSize;
+	String units;
+	String date;
+	String customerName;
+	String pricePerUnit;
+	String freightPrice;
+	String totalPrice;
+	File file;
+
+	public String getId() {
+		return id;
+	}
+
+	public String getProdName() {
+		return prodName;
+	}
+
+	public String getUnitSize() {
+		return unitSize;
+	}
+
+	public String getUnits() {
+		return units;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public String getPricePerUnit() {
+		return pricePerUnit;
+	}
+
+	public String getFreightPrice() {
+		return freightPrice;
+	}
+
+	public String getTotalPrice() {
+		return totalPrice;
+	}
+
+	public void generateInventory(){
+		file = new File("inventory.txt");
+		file.createNewFile();
+		
+	}
+	public Order(ResultSet rs) {
+		try {
+			while (rs.next()) {
+			this.id = rs.getString("OrderId");
+			this.prodName = rs.getString("ProductName");
+			this.unitSize = rs.getString("UnitSize");
+			this.units = rs.getString("Units");
+			this.date = rs.getString("OrderDate");
+			this.customerName = rs.getString("CustomerName");
+			this.pricePerUnit = rs.getString("DealerPricePerUnit");
+			this.freightPrice = rs.getString("FreightPrice");
+			this.totalPrice = rs.getString("TotalPrice");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	
+
+}
