@@ -5,6 +5,8 @@ import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,6 +27,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.commons.io.FileUtils;
 import org.jdesktop.swingx.JXDatePicker;
 
 import Utility.Order;
@@ -57,6 +60,8 @@ public class UserMainPage extends JFrame {
 	private JButton cancelB = new JButton("CANCEL");
 	private String prodIdForNewOrder = "";
 	private Inventory inv = null;
+	private JButton cancelBDate = new JButton("Cancel");
+	final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
 	/**
 	 * Create the frame.
@@ -91,6 +96,8 @@ public class UserMainPage extends JFrame {
 		final JPanel addNewProductPanel = new JPanel();
 		final JPanel checkProductPanelWithId = new JPanel();
 		final JPanel lookUpOrderPanel = new JPanel();
+		final JPanel lookUpOrderByDatePanel = new JPanel();
+		final JPanel resultLookUpByDate = new JPanel();
 		final CardLayout cl = new CardLayout();
 		contentPane.setLayout(cl);
 		contentPane.add(userPanel, "main");
@@ -100,14 +107,18 @@ public class UserMainPage extends JFrame {
 		contentPane.add(checkProductPanelWithId, "checkPID");
 		contentPane.add(resultProductPanel, "resultProd");
 		contentPane.add(lookUpOrderPanel, "lookUpOrder");
+		contentPane.add(lookUpOrderByDatePanel, "lookUpOrderByDate");
 		contentPane.add(resultOrderPanel, "resultOrder");
+		contentPane.add(resultLookUpByDate, "resultDate");
+		
 
-		userPanel.setLayout(new GridLayout(7, 1));
+		userPanel.setLayout(new GridLayout(8, 1));
 		cl.show(contentPane, "main");
 		userPanel.add(new JLabel("Click on any of the following options"));
 		JButton addNewUnits = new JButton("Add Units to Inventory");
 		JButton createAnOrder = new JButton("Create Order");
-		JButton lookUpOrder = new JButton("Look up an Order");
+		JButton lookUpOrder = new JButton("Look up an Order By Id");
+		JButton lookUpOrderByDate = new JButton("Look up an Order By Date");
 		JButton lookUpProductWithID = new JButton(
 				"Check Product Using Product ID");
 		JButton addNewProduct = new JButton("Add Product");
@@ -115,6 +126,7 @@ public class UserMainPage extends JFrame {
 		userPanel.add(addNewUnits);
 		userPanel.add(lookUpProductWithID);
 		userPanel.add(lookUpOrder);
+		userPanel.add(lookUpOrderByDate);
 		userPanel.add(createAnOrder);
 		userPanel.add(addNewProduct);
 		userPanel.add(logOff);
@@ -156,10 +168,23 @@ public class UserMainPage extends JFrame {
 			}
 		});
 		
+		lookUpOrderByDate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				lookUpOrderByDatePanel(lookUpOrderByDatePanel,  resultLookUpByDate, cancelB, cl);
+				cl.show(contentPane, "lookUpOrderByDate");
+			}
+		});
+		
+		
 		logOff.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				inv.resetDetails();
 				resetUserDetails();
+				try {
+					FileUtils.cleanDirectory(new File("C:/Inventory/Invoice"));
+				} catch (IOException e) {
+					MainInventory.logger.severe(e.getMessage());
+				}
 			}
 		});
 
@@ -300,7 +325,7 @@ public class UserMainPage extends JFrame {
 				orderpanel.add(btn);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			MainInventory.logger.severe(e.getMessage());
 		}
 		orderpanel.add(viewOrders);
 		viewOrders.addActionListener(new ActionListener() {
@@ -313,8 +338,82 @@ public class UserMainPage extends JFrame {
 		});
 		orderpanel.add(cancelB);
 	}
+	private void lookUpOrderByDatePanel(final JPanel orderpanel, final JPanel resultpanel, final JButton cancelB,
+			final CardLayout cl) {
+		orderpanel.removeAll();
+		
+		orderpanel.setLayout(new GridLayout(4,2));
+		JButton viewOrders = new JButton("View Orders");
+		orderpanel.add(new JLabel("Show all orders between the following dates"));
+		orderpanel.add(new JLabel(""));
+		final JXDatePicker fromDate = new JXDatePicker();
+		fromDate.setFormats(format);
+		final JXDatePicker toDate = new JXDatePicker();
+		toDate.setFormats(format);
+		orderpanel.add(new JLabel("From:"));
+		orderpanel.add(fromDate);
+		orderpanel.add(new JLabel("To:"));
+		orderpanel.add(toDate);
+		final ButtonGroup btnGrp = new ButtonGroup();
+		orderpanel.add(viewOrders);
+		resultpanel.setLayout((LayoutManager) new BoxLayout(resultpanel,
+				BoxLayout.Y_AXIS));
+		
+		viewOrders.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				resultpanel.removeAll();
+				resultpanel.add(new JLabel("Order Ids between the selected date range are below:"));
+				String where = "DealerId='"+username+"' and OrderDate between '"+format.format(fromDate.getDate())+"' and '"+format.format(toDate.getDate())+"'";
+				resultSet = Utility.getDetailsBasedOnOneCol("OrderId,CustomerName", where, "orders", connect, statement, resultSet);
+				try {
+					while (resultSet.next()) {
+						JRadioButton btn = new JRadioButton(
+								resultSet.getString("OrderId"));
+						btn.setActionCommand(resultSet.getString("OrderId"));
+						btnGrp.add(btn);
+						resultpanel.add(btn);
+					}
+				} catch (SQLException e) {
+					MainInventory.logger.severe(e.getMessage());
+				}
+				JButton viewOrdersPerDate = new JButton("View Order");
+				resultpanel.add(viewOrdersPerDate);
+				
+				JButton updatedCancelB = new JButton("Cancel");
+				updatedCancelB.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						cl.show(contentPane, "lookUpOrderByDate");
+					}
+				});
+				resultpanel.add(updatedCancelB);
+				viewOrdersPerDate.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						lookUpSingleOrderPanel(
+								btnGrp.getSelection().getActionCommand(),
+								resultOrderPanel,cl,cancelBDate);
+						cl.show(contentPane, "resultOrder");
+					}
+				});
+				cancelBDate.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						cl.show(contentPane, "resultDate");
+					}
+				});
+				
+				cl.show(contentPane, "resultDate");
+			}
+		});
+		orderpanel.add(cancelB);
+		
+		
+		
+	}
 
 	private void lookUpSingleOrderPanel(String orderId, JPanel panel,final CardLayout cl) {
+		lookUpSingleOrderPanel(orderId, panel,cl, cancelB);
+	}
+	
+	private void lookUpSingleOrderPanel(String orderId, JPanel panel,final CardLayout cl, JButton cancelB ) {
 		try {
 			panel.removeAll();
 			panel.setLayout(new GridLayout(10, 2));
@@ -353,14 +452,14 @@ public class UserMainPage extends JFrame {
 				panel.add(printB);
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			MainInventory.logger.severe(e.getMessage());
 		}
 
 	}
 
 	public void setUpCreateOrderPanel(JPanel panel, final CardLayout cl) {
 		JButton button = new JButton("Add new Order");
-
+		panel.removeAll();
 		final JComboBox<String> priceBox = new JComboBox<String>();
 		final JTextField qty = new JTextField();
 		final JTextField customerName = new JTextField();
@@ -370,7 +469,7 @@ public class UserMainPage extends JFrame {
 		final JTextField orderId = new JTextField();
 		final JButton getPriceList = new JButton("Get the PriceList");
 		final JXDatePicker date = new JXDatePicker();
-		final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		
 		date.setDate(Calendar.getInstance().getTime());
 		date.setFormats(format);
 		panel.setLayout(new GridLayout(12, 2));
@@ -409,7 +508,7 @@ public class UserMainPage extends JFrame {
 								.getFloat("RetailPriceWithFreight")));
 					}
 				} catch (SQLException e) {
-					e.printStackTrace();
+					MainInventory.logger.severe(e.getMessage());
 				}
 			}
 		});

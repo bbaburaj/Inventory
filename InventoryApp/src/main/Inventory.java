@@ -189,7 +189,7 @@ public class Inventory extends JFrame {
 			}
 			return !(count == 0);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			MainInventory.logger.severe(e.getMessage());
 		}
 		return false;
 	}
@@ -207,7 +207,7 @@ public class Inventory extends JFrame {
 			preparedStatement.setString(5, lName);
 			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			MainInventory.logger.severe(e.getMessage());
 		}
 
 	}
@@ -236,7 +236,7 @@ public class Inventory extends JFrame {
 						+ uName + " and your password is:" + pswrd);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			MainInventory.logger.severe(e.getMessage());
 		}
 	}
 	

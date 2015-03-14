@@ -9,6 +9,8 @@ import java.io.Writer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import main.MainInventory;
+
 import org.apache.commons.io.FileUtils;
 
 public class Order {
@@ -81,17 +83,17 @@ public class Order {
 			writer.write(createBodyForInventoryFile());
 			writer.write("</div></body></html>");
 		} catch (IOException e) {
-			e.printStackTrace();
+			MainInventory.logger.severe(e.getMessage());
 		} finally {
 			try {
 				writer.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				MainInventory.logger.severe(e.getMessage());
 			}
 		}
 		
-		copyFilesToDesktop();
+		Utility.copyFilesToDesktop(filename);
 
 	}
 
@@ -148,29 +150,10 @@ public class Order {
 				filename = filename+this.id+".html";
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			MainInventory.logger.severe(e.getMessage());
 		}
 	}
 	
-	public void copyFilesToDesktop(){
-		File newFolder = new File("C:\\Inventory");
-		newFolder.mkdir();
-		File source1 = new File(filename);
-		File dest1 = new File("C:\\Inventory\\"+filename);
-		File source2 = new File("InventoryStyle.css");
-		File dest2 = new File("C:\\Inventory\\InventoryStyle.css");
-		File source3 = new File("Logo.png");
-		File dest3 = new File("C:\\Inventory\\Logo.png");
-		
-		try {
-		    FileUtils.copyFile(source1, dest1);
-		    FileUtils.copyFile(source2, dest2);
-		    FileUtils.copyFile(source3, dest3);
-		    FileUtils.deleteQuietly(source1);
-		} catch (IOException e) {
-		    e.printStackTrace();
-		}
-	
-	}
+
 
 }

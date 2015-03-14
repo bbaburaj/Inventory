@@ -1,5 +1,6 @@
 package Utility;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +13,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 
+import main.MainInventory;
+
+import org.apache.commons.io.FileUtils;
+
 
 public class Utility {
 	public String getPropValue(String propName) throws IOException{
@@ -21,6 +26,7 @@ public class Utility {
 		if(ip!=null){
 			prop.load(ip);
 		}else{
+			MainInventory.logger.severe("Property file "+propFile+" not found in the class path");
 			throw new FileNotFoundException("Property file "+propFile+" not found in the class path");
 		}
 		return prop.getProperty(propName);		
@@ -33,7 +39,7 @@ public class Utility {
 					.getConnection(dbQuery
 							+ "user="+username+"&password="+psswd);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			MainInventory.logger.severe(e.getMessage());
 		}
 		return null;
 	}
@@ -43,11 +49,12 @@ public class Utility {
 			statement = connect.createStatement();
 			resultSet = statement
 					.executeQuery("select distinct "+column+" from "+table+";");
+			MainInventory.logger.info("select distinct "+column+" from "+table+";");
 				while (resultSet.next()) {
 					list.add(resultSet.getObject(column));
 				}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			MainInventory.logger.severe(e.getMessage());
 		}
 	}
 	
@@ -58,9 +65,10 @@ public class Utility {
 			statement = connect.createStatement();
 			resultSet = statement
 					.executeQuery("select "+select+" from "+table+" where "+clause+";");
+			MainInventory.logger.info("select "+select+" from "+table+" where "+clause+";");
 			return resultSet;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			MainInventory.logger.severe(e.getMessage());
 		}
 		return null;
 	}
@@ -70,7 +78,7 @@ public class Utility {
 			statement.executeUpdate("UPDATE Product SET Quantity="+qnty+" where productname=\""+prodname+"\" and unitsize="+unitsize+";");
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			MainInventory.logger.severe(e.getMessage());
 		}
 	}
 	
@@ -80,7 +88,7 @@ public class Utility {
 			return statement.executeUpdate("UPDATE Product SET "+clause+" where "+whereclause+";");
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			MainInventory.logger.severe(e.getMessage());
 		}
 		return 0;
 	}
@@ -91,7 +99,7 @@ public class Utility {
 			String query = "INSERT INTO product(`ProductId`,`ProductName`,`UnitSize`,`Quantity`,`DealerPrice`,`RetailPrice`,`RetailPriceWithFreight`) VALUES ('"+prodId+"','"+prodname+"','"+unitSize+"','"+qty+"','"+rp+"','"+dp+"','"+rpF+"');";
 			statement.executeUpdate(query);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			MainInventory.logger.severe(e.getMessage());
 		}
 	}
 	
@@ -103,8 +111,27 @@ public class Utility {
 			
 			statement.executeUpdate(query);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			MainInventory.logger.severe(e.getMessage());
 		}
+	}
+	
+	public static void copyFilesToDesktop(String filename){
+		File source1 = new File(filename);
+		File dest1 = new File("C:\\Inventory\\Invoice\\"+filename);
+		File source2 = new File("InventoryStyle.css");
+		File dest2 = new File("C:\\Inventory\\Invoice\\InventoryStyle.css");
+		File source3 = new File("Logo.png");
+		File dest3 = new File("C:\\Inventory\\Invoice\\Logo.png");
+		
+		try {
+		    FileUtils.copyFile(source1, dest1);
+		    FileUtils.copyFile(source2, dest2);
+		    FileUtils.copyFile(source3, dest3);
+		    FileUtils.deleteQuietly(source1);
+		} catch (IOException e) {
+		    MainInventory.logger.severe(e.getMessage());
+		}
+	
 	}
 	
 	
