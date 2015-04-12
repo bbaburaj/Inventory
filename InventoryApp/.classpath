@@ -15,13 +15,13 @@
 	<classpathentry kind="lib" path="C:/Users/Barathi/Desktop/ProgramminTools/Eclipsce Kepler/eclipse/plugins/com.ibm.icu_50.1.1.v201304230130.jar" sourcepath="C:/Users/Barathi/Desktop/ProgramminTools/Eclipsce Kepler/eclipse/plugins/com.ibm.icu.source_50.1.1.v201304230130.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Barathi/Desktop/ProgramminTools/Eclipsce Kepler/eclipse/plugins/org.eclipse.ui.forms_3.6.1.v20130822-1117.jar" sourcepath="C:/Users/Barathi/Desktop/ProgramminTools/Eclipsce Kepler/eclipse/plugins/org.eclipse.ui.forms.source_3.6.1.v20130822-1117.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files (x86)/MySQL/Connector.J 5.1/mysql-connector-java-5.1.34-bin.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/Java/jdk1.8.0_25/bin/swingx-0.9.4.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files (x86)/Java/jdk1.8.0_25/lib/missioncontrol/plugins/com.jrockit.mc.rjmx_5.4.0.162463/lib/mailapi.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files (x86)/Java/jdk1.8.0_25/lib/missioncontrol/plugins/com.jrockit.mc.rjmx_5.4.0.162463/lib/smtp.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Barathi/Documents/GitHub/Inventory/InventoryApp/lib/commons-io-2.4.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Barathi/Documents/GitHub/Inventory/InventoryApp/lib/commons-io-2.4-javadoc.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Barathi/Documents/GitHub/Inventory/InventoryApp/lib/commons-io-2.4-sources.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Barathi/Documents/GitHub/Inventory/InventoryApp/lib/commons-io-2.4-tests.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Barathi/Documents/GitHub/Inventory/InventoryApp/lib/commons-io-2.4-test-sources.jar"/>
+	<classpathentry kind="lib" path="lib/mailapi.jar"/>
+	<classpathentry kind="lib" path="lib/smtp-1.4.5.jar"/>
+	<classpathentry kind="lib" path="lib/swingx-0.9.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

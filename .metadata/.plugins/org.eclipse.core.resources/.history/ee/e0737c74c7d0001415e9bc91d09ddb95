@@ -1,0 +1,3 @@
+dbQuery=jdbc:mysql://localhost/inventory?
+username=root
+password=root2014

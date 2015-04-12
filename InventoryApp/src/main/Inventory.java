@@ -99,7 +99,7 @@ public class Inventory extends JFrame {
 				if (checkLogin(uName.getText(), pswrd.getText())) {
 					JOptionPane.showMessageDialog(contentPane, "Welcome "
 							+ first_name + " " + last_name + "!");
-					mainPage.setUserDetail(uName.getText(),first_name,last_name);
+					mainPage.setUserDetail(uName.getText(),first_name,last_name,pswrd.getText());
 					cl.show(mainPane, "user");
 				} else {
 					JOptionPane.showMessageDialog(contentPane,

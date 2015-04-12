@@ -17,11 +17,13 @@ public class MainInventory {
 	public static Logger logger = Logger.getLogger("Inventory");  
 	public static FileHandler fh;  
 	public static File newFolder;
-	public static File subInvoiceFolder;
+	public static File subInvoiceFolder,subLogFolder;
 	public static void main(String[] args){
 		try {
 			subInvoiceFolder = new File("C:\\Inventory\\Invoice");
 			subInvoiceFolder.mkdirs();
+			subLogFolder = new File("C:\\Inventory\\Logs");
+			subLogFolder.mkdirs();
 			fh = new FileHandler("C:\\Inventory\\Logs\\Inventory.log");
 			logger.addHandler(fh);
 	        SimpleFormatter formatter = new SimpleFormatter();  

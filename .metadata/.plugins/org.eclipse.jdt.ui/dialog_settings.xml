@@ -9,6 +9,12 @@
 	<item value="500" key="CallHierarchyViewPart.ratio3"/>
 	<list key="SearchScopeActionGroup.working_set">
 	</list>
+	<section name="org.eclipse.ltk.ui.refactoring.settings">
+		<item value="false" key="renameSubpackages"/>
+		<item value="false" key="updateQualifiedNames"/>
+		<item value="*" key="patterns"/>
+		<item value="false" key="updateTextualMatches"/>
+	</section>
 	<section name="SearchInDialog">
 		<item value="true" key="SearchInProjects"/>
 		<item value="true" key="SearchInAppLibs"/>
@@ -37,6 +43,24 @@
 		<item value="48" key="DIALOG_Y_ORIGIN"/>
 	</section>
 	<section name="CallHierarchySearchScope">
+	</section>
+	<section name="RefactoringWizard.preview">
+		<item value="600" key="width"/>
+		<item value="400" key="height"/>
+	</section>
+	<section name="FatJarPackageWizard">
+		<item value="C:\Users\Barathi\Documents\GitHub\Inventory" key="FatJarPackageWizardPage.ANTSCRIPT_LOCATION"/>
+		<item value="MainInventory - InventoryApp" key="FatJarPackageWizardPage.LAUNCH_CONFIGURATION_SELECTION_NAME"/>
+		<item value="C:\Users\Barathi\Documents\GitHub\Inventory\MiracleGrowInventory.jar" key="FatJarPackageWizardPage.DESTINATION_PATH_SELECTION"/>
+		<item value="false" key="FatJarPackageWizardPage.ANTSCRIPT_SAVE"/>
+		<item value="1" key="FatJarPackageWizardPage.LIBRARY_HANDLING"/>
+		<list key="FatJarPackageWizardPage.DESTINATION_NAMES_ID">
+			<item value="C:\Users\Barathi\Documents\GitHub\Inventory\MiracleGrowInventory.jar"/>
+		</list>
+		<list key="FatJarPackageWizardPage.ANTSCRIPT_LOCATION_HISTORY">
+			<item value="C:\Users\Barathi\Documents\GitHub\Inventory.xml"/>
+			<item value=".xml"/>
+		</list>
 	</section>
 	<section name="SourceActionDialog.methods">
 		<item value="false" key="SynchronizedModifier"/>
